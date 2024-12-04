@@ -12,6 +12,8 @@ public class PlayerPositionManager : Singleton<PlayerPositionManager>
     public CapsuleCollider capsuleCollider;
     public bool isQuiet=false;
     public DynamicMoveProvider dynamicMoveProvider;
+    public InputActionReference playMoveAction;
+    public Vector3 preMove;
     private void Update()
     {
         KeepCollider();
@@ -43,6 +45,11 @@ public class PlayerPositionManager : Singleton<PlayerPositionManager>
             dynamicMoveProvider.moveSpeed = 3f;
             isQuiet = false;       
         }
+        print(playMoveAction.action.ReadValue<Vector3>()-preMove==Vector3.zero);
+        if (playMoveAction.action.ReadValue<Vector3>() - preMove == Vector3.zero) {
+            isQuiet = true;
+        }
+        preMove = playMoveAction.action.ReadValue<Vector3>();
     }
     
 }

@@ -29564,6 +29564,8 @@ MonoBehaviour:
   capsuleCollider: {fileID: 1621566527}
   isQuiet: 0
   dynamicMoveProvider: {fileID: 2027453185}
+  playMoveAction: {fileID: 7862207684358717888, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  preMove: {x: 0, y: 0, z: 0}
 --- !u!1001 &1629301865
 PrefabInstance:
   m_ObjectHideFlags: 0
