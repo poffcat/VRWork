@@ -5,7 +5,7 @@ using UnityEngine;
 public class GuardManager : Singleton<GuardManager>
 {
     public List<Guard> guards;
-    public void PlayerInSight() { 
+    public void FoundPlayer() { 
     foreach (var guard in guards)
         {
             guard.playerInSight=true;

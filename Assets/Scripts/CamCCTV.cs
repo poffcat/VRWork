@@ -9,7 +9,7 @@ public class CamCCTV : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            GuardManager.Instance.PlayerInSight();
+            GuardManager.Instance.FoundPlayer();
             print("CCTV Found Player");
         }
     }

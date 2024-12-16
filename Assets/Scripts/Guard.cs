@@ -6,9 +6,6 @@ using UnityEngine.AI;
 public class Guard : MonoBehaviour
 {
     public bool playerInSight;
-    public float AngularSpeed;
-    public float angularDampTime = 0.7f;
-    public float speedDampTime = 0.1f;
     public float viewAngle = 120f;
     public Vector3 lastSighting;
     public Vector3 previousSighting;
@@ -18,29 +15,42 @@ public class Guard : MonoBehaviour
     public NavMeshAgent ai;
     public Vector3[] points;
 
+    public Vector3[] patrolPoints; // 巡逻点数组
+    private int currentPatrolIndex = 0; // 当前巡逻点索引
+    private bool patrollingForward = true; // 是否正向巡逻
+
+    public float patrolWaitTime = 2f; // 到达巡逻点后等待时间
+    private float patrolWaitTimer; // 等待计时器
     private void Update()
     {
-     NavAnimSetup();
-      
+        if (playerInSight)
+        {
+            // 玩家在视野内，追踪玩家
+            ai.speed = 3.5f;
+            animator.SetFloat("Speed", 4f);
+            ai.SetDestination(PlayerPositionManager.Instance.GetPlayerPositon());
+            animator.SetFloat("Speed", ai.velocity.magnitude);
+        }
+        else
+        {
+            ai.speed = 1.5f;
+            animator.SetFloat("Speed", 1.5f);
+            Patrol(); // 执行巡逻逻辑
+        }
+
     }
     private void Start()
     {
         animator = GetComponent<Animator>();
         ai = GetComponent<NavMeshAgent>();
-       ai.updateRotation = false;
+       //ai.updateRotation = false;
         animator.SetLayerWeight(1, 1f);
         animator.SetLayerWeight(2, 1f);
         col = GetComponent<SphereCollider>();
         print(PlayerPositionManager.Instance.GetPlayerPositon());
-        ai.SetDestination(PlayerPositionManager.Instance.GetPlayerPositon());
-        animator.SetFloat("Speed", 1f);
+       
     }
 
-    private void OnAnimatorMove()
-    {
-        ai.velocity = animator.deltaPosition / Time.deltaTime;
-        transform.rotation = animator.rootRotation;
-    }
     private void OnTriggerStay(Collider other)
     {
         if(other.gameObject.tag!="Player") return;
@@ -49,9 +59,10 @@ public class Guard : MonoBehaviour
         float angle = Vector3.Angle(dir, transform.forward);
         if (angle < viewAngle * 0.5f) { 
         RaycastHit hit;
-            if (Physics.Raycast(transform.position + transform.up * 2, dir.normalized, out hit, col.radius)) {
+            if (Physics.Raycast(transform.position + transform.up , dir.normalized, out hit, col.radius)) {
                 if (hit.collider.gameObject.tag == "Player") { 
                 playerInSight=true;
+                    GuardManager.Instance.FoundPlayer();
                 lastSighting=PlayerPositionManager.Instance.GetPlayerPositon();
                 }
             }
@@ -85,39 +96,42 @@ public class Guard : MonoBehaviour
         }
         return pathLength;
     }
-    void SetSpeed(float speed,float angle) {
-       // float angularSpeed = angle / (angularDampTime - 0.1f);
-        float angularSpeed = Mathf.LerpAngle(0f, angle, Time.deltaTime / angularDampTime); // 平滑角度变化
-        animator.SetFloat("Speed", speed,speedDampTime,Time.deltaTime);
-        animator.SetFloat("AngularSpeed", angularSpeed,angularDampTime,Time.deltaTime);
-    }
-    float FindAngle(Vector3 fromVector,Vector3 toVector,Vector3 upVector) {
-        if (toVector == Vector3.zero) {
-            return 0f;
-        }
-        float angle=Vector3.Angle(fromVector, toVector);
-        Vector3 normal=Vector3.Cross(fromVector, toVector);
-        angle *= Mathf.Sign(Vector3.Dot(normal, upVector));
-        angle = Mathf.Clamp(angle, -180f, 180f);
-        angle += Mathf.Rad2Deg;
-        return angle;
-    }
-    void NavAnimSetup() {
-        float speed;
-        float angle;
-        if (playerInSight) { 
-        speed = 0f;
-        angle = FindAngle(transform.forward, PlayerPositionManager.Instance.GetPlayerPositon() - transform.position, Vector3.up);
-        }
-        else
+    private void Patrol()
+    {
+        if (ai.remainingDistance <= ai.stoppingDistance && !ai.pathPending)
         {
-            speed = Vector3.Project(ai.desiredVelocity, transform.forward).magnitude;
-            angle = FindAngle(transform.forward, ai.desiredVelocity, transform.up);
-            if (Mathf.Abs(angle) < deadZone) {
-                transform.LookAt(transform.position + ai.desiredVelocity);
-                angle = 0f;
+            // 巡逻点到达后等待
+            patrolWaitTimer += Time.deltaTime;
+            animator.SetFloat("Speed", 0f);
+            if (patrolWaitTimer >= patrolWaitTime)
+            {
+                // 等待结束后移动到下一个巡逻点
+                patrolWaitTimer = 0f;
+
+                if (patrollingForward)
+                {
+                    currentPatrolIndex++;
+                    if (currentPatrolIndex >= patrolPoints.Length)
+                    {
+                        currentPatrolIndex = currentPatrolIndex%patrolPoints.Length;
+                        patrollingForward = false;
+                    }
+                }
+                else
+                {
+                    currentPatrolIndex--;
+                    if (currentPatrolIndex < 0)
+                    {
+                        currentPatrolIndex = 0;
+                        patrollingForward = true;
+                    }
+                }
+                Debug.Log("Index:" + currentPatrolIndex + "  Points:" + patrolPoints[currentPatrolIndex]);
+                ai.SetDestination(patrolPoints[currentPatrolIndex]);
             }
         }
-        SetSpeed(speed, angle);
     }
+
+
+
 }

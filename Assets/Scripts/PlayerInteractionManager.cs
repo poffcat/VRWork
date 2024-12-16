@@ -7,7 +7,8 @@ public class PlayerInteractionManager : Singleton<PlayerInteractionManager>
 {
     [SerializeField]
     private bool hasCard;
-    public GameObject card;
+    
+    public Card card;
     private void Start()
     {
         RegistCardEvent();
@@ -22,11 +23,14 @@ public class PlayerInteractionManager : Singleton<PlayerInteractionManager>
     }
     private void GetCard(FocusEnterEventArgs a) { 
     hasCard = true;
+        card.ResetToDefault();
+        card.enabled = false;
         print("get");
     }
     private void PutCard(FocusExitEventArgs a) { 
     hasCard=false;
-        print("put");
+    card.enabled = true;
+    print("put");
     }
 
 }
