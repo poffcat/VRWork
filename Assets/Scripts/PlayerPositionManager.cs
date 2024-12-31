@@ -14,11 +14,16 @@ public class PlayerPositionManager : Singleton<PlayerPositionManager>
     public DynamicMoveProvider dynamicMoveProvider;
     public InputActionReference playMoveAction;
     public Vector2 preMove;
+    public GameObject m;
+    private void Start()
+    {
+    }
     private void Update()
     {
         KeepCollider();
         UpdateState();
         SwitchSpeed();
+       
     }
     private void OnEnable()
     {
@@ -28,8 +33,9 @@ public class PlayerPositionManager : Singleton<PlayerPositionManager>
     
     capsuleCollider.center=characterController.center;
     }
-    public Vector3 GetPlayerPositon() { 
-    return playerPosition;
+    public Vector3 GetPlayerPositon() {
+        m.transform.position = Camera.main.transform.position-new Vector3(0,0.5f,0);
+    return Camera.main.transform.position - new Vector3(0, 0.5f, 0);
     }
     public void UpdateState() { 
         playerPosition =transform.position;
