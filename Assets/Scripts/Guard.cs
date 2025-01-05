@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using DG.Tweening;
-using UnityEngine.Experimental.GlobalIllumination;
+
 
 public class Guard : MonoBehaviour
 {
@@ -16,22 +16,20 @@ public class Guard : MonoBehaviour
     public Animator animator;
     public NavMeshAgent ai;
     public Vector3[] points;
+    public Light light;
     public Vector3[] patrolPoints; // 巡逻点数组
     private int currentPatrolIndex = 0; // 当前巡逻点索引
     private bool patrollingForward = true; // 是否正向巡逻
 
     public float patrolWaitTime = 2f; // 到达巡逻点后等待时间
-    public float patrolWaitTimer=0; // 等待计时器
+    private float patrolWaitTimer; // 等待计时器
 
-    public float shootWaitTime = 2f;
-    public float shootWaitTimer=0;
-
-    public GameObject bulletPrefab;
+    public float shootWaitTime = 3f;
+    private float shootWaitTimer;
     public Transform shootPoint;
+    public LineRenderer lineRenderer;
     private Coroutine coroutine;
-
-    public CameraShake shake;
-    private void FixedUpdate()
+    private void Update()
     {
         if (playerInSight)
         {
@@ -43,19 +41,13 @@ public class Guard : MonoBehaviour
                 animator.SetFloat("Speed", ai.velocity.magnitude);
             }
             ai.SetDestination(PlayerPositionManager.Instance.GetPlayerPositon());
-
+        
 
         }
         else
         {
             ai.speed = 1.5f;
             animator.SetFloat("Speed", 1.5f);
-            if (coroutine != null)
-            {
-                StopCoroutine(coroutine);
-                coroutine = null;
-            }
-            animator.SetBool("PlayerInSight", false);
             Patrol(); // 执行巡逻逻辑
         }
 
@@ -64,52 +56,47 @@ public class Guard : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         ai = GetComponent<NavMeshAgent>();
-        //ai.updateRotation = false;
+       //ai.updateRotation = false;
         animator.SetLayerWeight(1, 1f);
         animator.SetLayerWeight(2, 1f);
         col = GetComponent<SphereCollider>();
         print(PlayerPositionManager.Instance.GetPlayerPositon());
-        // lineRenderer.gameObject.SetActive(false);
+        lineRenderer.gameObject.SetActive(false);
+
     }
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.gameObject.tag != "Player") return;
-        playerInSight = false;
-
-        Vector3 dir = PlayerPositionManager.Instance.GetPlayerPositon() - transform.position;
+        if(other.gameObject.tag!="Player") return;
+         playerInSight = false;
+       
+        Vector3 dir= PlayerPositionManager.Instance.GetPlayerPositon() - transform.position;
         dir.y = 0;
         float angle = Vector3.Angle(dir, transform.forward);
-
+     
         //print(angle);
-        if (angle < viewAngle * 0.5f)
-        {
-            RaycastHit hit;
-            Debug.DrawLine(transform.position + transform.up, transform.position + transform.up + (dir.normalized) * 2, Color.red);
-            if (Physics.Raycast(transform.position + transform.up, dir.normalized, out hit, col.radius))
-            {
+        if (angle < viewAngle * 0.5f) { 
+        RaycastHit hit;
+            Debug.DrawLine(transform.position + transform.up, transform.position + transform.up + (dir.normalized)*2, Color.red);
+            if (Physics.Raycast(transform.position + transform.up , dir.normalized, out hit, col.radius)) {
                 print("Check");
                 print(hit.collider.gameObject.name);
-                if (hit.collider.gameObject.tag == "Player")
-                {
+                if (hit.collider.gameObject.tag == "Player") {
                     print("See");
-                    playerInSight = true;
+                playerInSight=true;
                     GuardManager.Instance.FoundPlayer();
-                    lastSighting = PlayerPositionManager.Instance.GetPlayerPositon();
-                    if (coroutine == null) 
-                        coroutine=StartCoroutine(StartShoot());
-                       
-
+                lastSighting=PlayerPositionManager.Instance.GetPlayerPositon();
+                    if(coroutine==null)
+                    coroutine = StartCoroutine(StartShoot(lineRenderer));
+                    
                 }
             }
         }
-        if (!PlayerPositionManager.Instance.isQuiet)
-        {
-            if (GetPathLength(PlayerPositionManager.Instance.GetPlayerPositon()) <= col.radius)
-            {
+        if (!PlayerPositionManager.Instance.isQuiet) {
+            if (GetPathLength(PlayerPositionManager.Instance.GetPlayerPositon()) <= col.radius) {
                 lastSighting = PlayerPositionManager.Instance.GetPlayerPositon();
                 playerInSight = true;
-
+               
             }
         }
 
@@ -123,24 +110,20 @@ public class Guard : MonoBehaviour
         }
 
     }
-    float GetPathLength(Vector3 target)
-    {
-        NavMeshPath path = new NavMeshPath();
-        if (ai.enabled)
-        {
+    float GetPathLength(Vector3 target) { 
+    NavMeshPath path=new NavMeshPath();
+        if (ai.enabled) {
             ai.CalculatePath(target, path);
         }
         Vector3[] allPoints = new Vector3[path.corners.Length + 2];
         allPoints[0] = transform.position;
-        allPoints[allPoints.Length - 1] = target;
-        for (int i = 0; i < path.corners.Length; i++)
-        {
+        allPoints[allPoints.Length-1]=target;
+        for (int i = 0; i < path.corners.Length; i++) {
             allPoints[i + 1] = path.corners[i];
         }
         float pathLength = 0;
-        for (int i = 0; i < allPoints.Length - 1; i++)
-        {
-            pathLength += Vector3.Distance(allPoints[i], allPoints[i + 1]);
+        for (int i = 0; i < allPoints.Length-1; i++) {
+            pathLength += Vector3.Distance(allPoints[i],allPoints[i+1]);
         }
         return pathLength;
     }
@@ -161,7 +144,7 @@ public class Guard : MonoBehaviour
                     currentPatrolIndex++;
                     if (currentPatrolIndex >= patrolPoints.Length)
                     {
-                        currentPatrolIndex = currentPatrolIndex % patrolPoints.Length;
+                        currentPatrolIndex = currentPatrolIndex%patrolPoints.Length;
                         patrollingForward = false;
                     }
                 }
@@ -180,22 +163,36 @@ public class Guard : MonoBehaviour
         }
     }
 
-
-    IEnumerator StartShoot()
-    {
-
+  
+    IEnumerator StartShoot(LineRenderer lineRenderer) {
+    
         while (true)
         {
             animator.SetBool("PlayerInSight", true);
             ai.speed = 0.8f;
             animator.SetFloat("Speed", 1f);
             shootWaitTimer += Time.deltaTime;
-            PlayerHealth.Instance.HealthDown();
-            SoundManager.Instance.PlayOneShot(1, 0.3f);
-            shake.Shake();
-           yield return new WaitForSeconds(0.9f);    
-        }
+            if (shootWaitTimer >= shootWaitTime)
+            {
+                lineRenderer.gameObject.SetActive(true);
+                shootWaitTimer = 0;
+                yield return new WaitForSeconds(0.9f);
+                lineRenderer.positionCount = 2;
+                lineRenderer.startWidth = 0.05f;
+                lineRenderer.endWidth = 0.025f;
+                lineRenderer.SetPosition(0, shootPoint.position);
+                lineRenderer.SetPosition(1, new Vector3(PlayerPositionManager.Instance.GetPlayerPositon().x, shootPoint.position.y, PlayerPositionManager.Instance.GetPlayerPositon().z));
+                light.intensity = 2f;
+                light.DOIntensity(0, 0.3f);
+                StartCoroutine(LineFade());
 
+            }
+        }
+       
     }
-   
+    IEnumerator LineFade() {
+        yield return new WaitForSeconds(0.3f);
+
+        lineRenderer.gameObject.SetActive(false);
+    }
 }
