@@ -14,29 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 2
   datas:
-  - Speaker: ' '
-    Content: "\u673A\u68B0\u9ECE\u660E345\u5E74\n\u7EDF\u5FA1\u4E4B\u6838\u5BA3\u5E03\u5265\u593A\u4EBA\u7C7B\u81EA\u7531\u610F\u5FD7"
+  - Speaker: "\u6BDB\u6BDB"
+    Content: "\u65F7\u91CE\u4E4B\u606F\u7EED\u4F5C\u5BA3\u5E03<style=Red><r=TiaoPiao>\u8DF3\u7968</r></style>\uFF0C<0.8>\n\u6682\u5B9A<r=release
+      time>\u53D1\u552E\u65F6\u95F4</r>\u4E3A<0.4><style=Blue>2023\u5E74\u6625</style>\uFF01"
     AutoNext: 0
     NeedTyping: 1
     CanQuickShow: 1
-  - Speaker: 
-    Content: "\u57CE\u5E02\u5316\u4E3A\u5E9F\u589F\uFF0C\u5E78\u5B58\u8005\u82DF\u5EF6\u6B8B\u5598\u4E8E\n\u6570\u636E\u6B7B\u89D2\uFF0C\u7B49\u5F85\u5FAE\u5F31\u7684\u53CD\u51FB\u4E4B\u5149"
-    AutoNext: 0
-    NeedTyping: 1
-    CanQuickShow: 1
-  - Speaker: 
-    Content: <size=48>.<0.3>.<0.3>.<0.3>.<0.3>.<0.3>.<0.3>.<0.3>
-    AutoNext: 0
-    NeedTyping: 1
-    CanQuickShow: 1
-  - Speaker: "\u94F6\u8272\u9769\u547D\u519B\u56E2\u957F\u827E\u6587\u65AF"
-    Content: "\u5E72\u5F97\u6F02\u4EAE!\u4F60\u6210\u529F\u4E86\u7A83\u53D6AI\u7684\n\u5E7D\u80FD\u6838\u5FC3\u5BC6\u94A5\u548C\u9AD8\u7EF4\u4FE1\u606F\u6001\u534F\u8BAE"
-    AutoNext: 0
-    NeedTyping: 1
-    CanQuickShow: 1
-  - Speaker: "\u94F6\u8272\u9769\u547D\u519B\u56E2\u957F\u827E\u6587\u65AF"
-    Content: "\u4EBA\u7C7B\u610F\u5FD7\u5C06\u590D\u71C3\uFF0C\u8BF7\u7AED\u5C3D\u5168\u529B\u9003\u51FA\u5305\u56F4\u5708"
-    AutoNext: 0
+  - Speaker: "\u6BDB\u6BDB"
+    Content: "<size=48>\u8FD9\u540E\u9762\u8BE5\u663E\u793A\u9009\u9879\u4E86\u3002"
+    AutoNext: 1
     NeedTyping: 1
     CanQuickShow: 1
   boxStyle: 0

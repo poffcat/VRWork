@@ -5,7 +5,6 @@ using UnityEngine;
 public class CheckDoor : MonoBehaviour, ITimeTricker
 {
     int time = 0;
-
     void Start()
     {
         TimeManager.Instance.RegistTricker(this);

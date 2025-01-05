@@ -9,8 +9,6 @@ TagManager:
   - Fader
   - MainLight
   - Alarm
-  - LeftHand
-  - RightHand
   layers:
   - Default
   - TransparentFX

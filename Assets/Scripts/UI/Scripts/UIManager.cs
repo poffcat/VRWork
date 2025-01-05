@@ -17,7 +17,8 @@ public class UIManager : MonoBehaviour
         }
         _instance = this;
         _instance._pfbButtonA = Resources.Load<GameObject>("UI/Button/ButtonA");
-       // HideCursorA();
+        HideCursorA();
+        DontDestroyOnLoad(gameObject);
     }
 
     private Selectable _currentSelectable;

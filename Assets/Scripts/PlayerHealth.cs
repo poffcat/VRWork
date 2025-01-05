@@ -1,9 +1,7 @@
 using Leguar.LowHealth;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.SearchService;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerHealth :Singleton<PlayerHealth>
 {
@@ -11,7 +9,6 @@ public class PlayerHealth :Singleton<PlayerHealth>
     public int Health=100;
     public LowHealthController shaderControllerScript;
     public LowHealthDirectAccess shaderAccessScript;
-    Coroutine coroutine;
     private float takingDamage;
     void Start()
     {
@@ -31,16 +28,13 @@ public class PlayerHealth :Singleton<PlayerHealth>
             shaderAccessScript.SetColorLossEffect(takingDamage, 1f);
             //				shaderAccessScript.SetVisionLossEffect(takingDamage*0.5f); // Uncomment to add darkening effect to taking damage, but this will then clash with "Waking up 1" effect
         }
-        if (Health <= 0 && coroutine == null) {
-          coroutine = StartCoroutine(ReStart());
-        }
+
     }
 
     public void HealthDown() {
         if(Health>0)
         Health -= 10;
-
-        
+      
         setNewPlayerHealth(Health / 150f, true);
 
     }
@@ -62,10 +56,6 @@ public class PlayerHealth :Singleton<PlayerHealth>
 
         }
 
-    }
-    IEnumerator ReStart() {
-        yield return new WaitForSeconds(3);
-        SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 
 }
