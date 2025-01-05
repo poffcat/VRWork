@@ -6,10 +6,11 @@ public class SoundManager : Singleton<SoundManager>
 {
     public AudioSource[] audios;
     public List<AudioClip> clips=new List<AudioClip>();
-
+    public AudioSource[] loopAudios;
     private void Start()
     {
         audios = GetComponents<AudioSource>();
+        loopAudios = GetComponentsInChildren<AudioSource>();
         foreach (var a in audios) { 
         a.playOnAwake=false;
             a.loop = false;    
