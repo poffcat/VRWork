@@ -7,6 +7,13 @@ public class TimeManager : Singleton<TimeManager>
 {
    List<ITimeTricker> trickers = new List<ITimeTricker>();
     float time=0;
+    public SequenceEventExecutor exe;
+
+    private void Start()
+    {
+        exe.Init((x)=> { UIManager.CloseDialogueBox(); });
+        exe.Execute();
+    }
     private void Update()
     {
         time += Time.deltaTime;

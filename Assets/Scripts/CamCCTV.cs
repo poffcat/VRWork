@@ -10,6 +10,8 @@ public class CamCCTV : MonoBehaviour
         if (other.tag == "Player")
         {
             GuardManager.Instance.FoundPlayer();
+            SoundManager.Instance.PlayOneShot(0, 0.6f);
+            PlayerHealth.Instance.TakeDamageClicked();
             print("CCTV Found Player");
         }
     }

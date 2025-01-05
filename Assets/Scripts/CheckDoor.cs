@@ -31,7 +31,10 @@ public class CheckDoor : MonoBehaviour, ITimeTricker
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Player") {
+            PlayerHealth.Instance.TakeDamageClicked();
             print("Found Player");
+            GuardManager.Instance.FoundPlayer();
+            SoundManager.Instance.PlayOneShot(0,0.6f);
         }
     }
 
